@@ -1,0 +1,7 @@
+.idea/
+*.exe
+*.log
+*.stackdump
+.DS_Store
+vendor/
+.hydra.yml
