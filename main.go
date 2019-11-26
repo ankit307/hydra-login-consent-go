@@ -98,11 +98,9 @@ func handleConsent(w http.ResponseWriter, r *http.Request) {
 }
 
 // The user hits this endpoint if not authenticated. In this example, they can sign in with the credentials
-// buzz:lightyear
+// ankit:test
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	consentRequestID := r.URL.Query().Get("login_challenge")
-
-	log.Println("Rendering  Login Form", consentRequestID)
 	if r.Method == "POST" {
 		consentRequestID := r.URL.Query().Get("consent")
 		log.Println("posted Login Form")
@@ -122,14 +120,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("consentRequestID %v\n", consentRequestID)
-		getLoginReq, errgLog := c.Admin.GetLoginRequest(&admin.GetLoginRequestParams{
+		getLoginReq, _ := c.Admin.GetLoginRequest(&admin.GetLoginRequestParams{
 			LoginChallenge: consentRequestID,
 			Context:        context.Background(),
 		})
 		log.Println("getLoginReq", getLoginReq)
-		if errgLog != nil {
-			log.Println("Error : errLog", errgLog)
-		}
 		name := "ankit"
 		loginRequest, errLog := c.Admin.AcceptLoginRequest(&admin.AcceptLoginRequestParams{
 			LoginChallenge: consentRequestID,
@@ -140,15 +135,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 			},
 			Context: r.Context(),
 		})
-
-		log.Println("Error : errLog", errLog)
 		log.Println("loginRequest", loginRequest)
-
 		if errLog != nil {
 			http.Error(w, errors.Wrap(errLog, "The consent request endpoint does not respond").Error(), http.StatusBadRequest)
 			return
 		}
-		// log.Println("Consent Request", consentRequest)
 		// It's a get request, so let's render the template
 		//renderTemplate(w, "login.html", "consentRequestID")
 		http.Redirect(w, r, loginRequest.Payload.RedirectTo, http.StatusFound)
